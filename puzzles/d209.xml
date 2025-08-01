@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<puzzle name="D209">
+  <board>
+	<size>7, 6</size>
+	<extwall>5, 4</extwall>
+	<mirrorident>False</mirrorident>
+  </board>
+  <clssiz>
+	<class name="big"><size>2, 2</size></class>
+	<class name="vert"><size>2, 1</size></class>
+	<class name="horiz"><size>1, 2</size></class>
+	<class name="small"><size>1, 1</size></class>
+  </clssiz>
+  <komaset>
+	<koma name="p1">
+	  <class>small</class><init>1, 1</init>
+	</koma>
+	<koma name="p2">
+	  <class>big</class><init>1, 2</init>
+	  <goal>4, 2</goal>
+	</koma>
+	<koma name="p3">
+	  <class>small</class><init>2, 1</init>
+	</koma>
+	<koma name="p4">
+	  <class>vert</class><init>2, 4</init>
+	</koma>
+	<koma name="p5">
+	  <class>horiz</class><init>3, 1</init>
+	</koma>
+	<koma name="p6">
+	  <class>vert</class><init>3, 3</init>
+	</koma>
+	<koma name="p7">
+	  <class>small</class><init>4, 1</init>
+	</koma>
+	<koma name="p8">
+	  <class>small</class><init>4, 4</init>
+	</koma>
+	<koma name="p9">
+	  <class>small</class><init>5, 1</init>
+	</koma>
+	<koma name="p10">
+	  <class>horiz</class><init>5, 2</init>
+	</koma>
+  </komaset>
+</puzzle>

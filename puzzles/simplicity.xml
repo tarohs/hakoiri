@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<puzzle name="Simplicity">
+  <!--
+	  https://www.puzzlebeast.com/slidingblock/index.html
+	  https://www.mathpuzzle.com/MAA/31-Sliding%20Block%20Puzzles/mathgames_12_13_04.html
+  -->
+  <board>
+	<size>6, 6</size>
+	<goaltype>byclass</goaltype>
+	<mirrorident>False</mirrorident>
+  </board>
+  <clssiz>
+	<class name="red">
+	  <size>2, 2</size>
+	  <bitmap>10
+	          11</bitmap>
+	</class>
+	<class name="blue">
+	  <size>1, 2</size>
+	</class>
+	<class name="green">
+	  <size>2, 1</size>
+	</class>
+	<class name="yellow">
+	  <size>2, 2</size>
+	  <bitmap>10
+	          11</bitmap>
+	</class>
+  </clssiz>
+  <komaset>
+	<koma name="red">
+	  <class>red</class><init>3, 3</init>
+	  <goal>1, 1</goal>
+	</koma>
+	<koma name="blue">
+	  <class>blue</class><init>2, 1</init>
+	</koma>
+	<koma name="green">
+	  <class>green</class><init>3, 2</init>
+	</koma>
+	<koma name="yellow">
+	  <class>yellow</class><init>1, 3</init>
+	</koma>
+  </komaset>
+</puzzle>

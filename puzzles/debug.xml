@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<puzzle name="hakoiri basic">
+  <board>
+	<size>5, 4</size>
+        <goaltype>byclass</goaltype>
+  </board>
+  <clssiz>
+	<class name="small"><size>1, 1</size></class>
+  </clssiz>
+  <komaset>
+	<koma name="p1">
+	  <class>small</class><init>1, 1</init>
+	  <goal>2, 1</goal>
+	</koma>
+	<koma name="p2">
+	  <class>small</class><init>1, 2</init>
+	  <goal>2, 2</goal>
+	</koma>
+	<koma name="p3">
+	  <class>small</class><init>2, 1</init>
+	  <goal>3, 1</goal>
+	</koma>
+	<koma name="p4">
+	  <class>small</class><init>2, 2</init>
+	  <goal>3, 2</goal>
+	</koma>
+  </komaset>
+</puzzle>

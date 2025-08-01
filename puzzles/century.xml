@@ -1,0 +1,60 @@
+<!-- komaset Conway's century 
+(https://david.fremlin.de/century.htm)
+(https://www.cs.brandeis.edu/~storer/JimPuzzles/ZPAGES/zzzCenturyPuzzles.html)
+note: start from the center vertical block (at half grid) to left
+-->
+<!--<puzzle name="Conway's century">-->
+<puzzle name="Conway's century and a half">
+  <board>
+	<size>7, 6</size>
+  </board>
+  <clssiz>
+	<class name="vert"><size>2, 1</size></class>
+	<class name="big"><size>2, 2</size></class>
+	<class name="horiz"><size>1, 2</size></class>
+	<class name="small"><size>1, 1</size></class>
+  </clssiz>
+  <komaset>
+	<koma name="X">
+	  <class>big</class>
+	  <init>1, 2</init>
+	  <goal>4, 2</goal>
+	</koma>
+	<koma name="1">
+	  <class>small</class>
+	  <init>1, 1</init>
+	</koma>
+	<koma name="2">
+	  <class>small</class>
+	  <init>1, 4</init>
+	</koma>
+	<koma name="3">
+	  <class>small</class>
+	  <init>4, 1</init>
+	</koma>
+	<koma name="4">
+	  <class>small</class>
+	  <init>4, 4</init>
+	</koma>
+	<koma name="A">
+	  <class>vert</class>
+	  <init>2, 1</init>
+	</koma>
+	<koma name="B">
+	  <class>vert</class>
+	  <init>3, 2</init>
+	</koma>
+	<koma name="C">
+	  <class>vert</class>
+	  <init>2, 4</init>
+	</koma>
+	<koma name="J">
+	  <class>horiz</class>
+	  <init>5, 1</init>
+	</koma>
+	<koma name="K">
+	  <class>horiz</class>
+	  <init>5, 3</init>
+	</koma>
+  </komaset>
+</puzzle>

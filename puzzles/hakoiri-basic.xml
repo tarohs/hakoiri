@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<puzzle name="hakoiri basic">
+  <board>
+	<size>7, 6</size>
+  </board>
+  <clssiz>
+	<class name="big">
+	  <size>2, 2</size>
+<!--  <bitmap>11
+	          11</bitmap>-->
+	</class>
+	<class name="vert"><size>2, 1</size></class>
+	<class name="horiz"><size>1, 2</size></class>
+	<class name="small"><size>1, 1</size></class>
+  </clssiz>
+  <komaset>
+	<koma name="musume">
+	  <class>big</class><init>1, 2</init>
+	  <goal>4, 2</goal>
+	</koma>
+	<koma name="chichi">
+	  <class>vert</class><init>1, 1</init>
+	</koma>
+	<koma name="haha">
+	  <class>vert</class><init>1, 4</init>
+	</koma>
+	<koma name="sofu"><short>sf</short>
+	  <class>vert</class><init>3, 1</init>
+	</koma>
+	<koma name="sobo"><short>sb</short>
+	  <class>vert</class><init>3, 4</init>
+	</koma>
+	<koma name="kyoudai">
+	  <class>horiz</class><init>3, 2</init>
+	</koma>
+	<koma name="kadou">
+	  <class>small</class><init>4, 2</init>
+	</koma>
+	<koma name="sadou">
+	  <class>small</class><init>4, 3</init>
+	</koma>
+	<koma name="wasai">
+	  <class>small</class><init>5, 1</init>
+	</koma>
+	<koma name="shodou">
+	  <class>small</class><init>5, 4</init>
+	</koma>
+  </komaset>
+</puzzle>

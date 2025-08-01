@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<puzzle name="Soap">
+  <!--
+	  https://www.cs.brandeis.edu/~storer/JimPuzzles/ZPAGES/zzzSoap.html
+	  by Ed Pegg Jr.
+  -->
+  <board>
+	<size>7, 6</size>
+	<goaltype>byid</goaltype>
+        <mirrorident>False</mirrorident>
+  </board>
+  <clssiz>
+	<class name="soap">
+	  <size>1, 2</size>
+	</class>
+	<class name="horiz">
+	  <size>1, 2</size>
+	</class>
+	<class name="ll">
+	  <size>2, 2</size>
+          <bitmap>11
+                  01</bitmap>
+	</class>
+	<class name="rl">
+	  <size>2, 2</size>
+          <bitmap>11
+                  10</bitmap>
+	</class>
+	<class name="vert">
+	  <size>2, 1</size>
+	</class>
+  </clssiz>
+  <komaset>
+	<koma name="soap">
+	  <class>soap</class><init>5, 2</init>
+	  <goal>2, 2</goal>
+	</koma>
+	<koma name="horiz">
+	  <class>horiz</class><init>2, 2</init>
+	  <goal>5, 2</goal>
+	</koma>
+	<koma name="ll">
+	  <class>ll</class><init>3, 1</init>
+	  <goal>3, 1</goal>
+	</koma>
+	<koma name="rl">
+	  <class>rl</class><init>3, 3</init>
+	  <goal>3, 3</goal>
+	</koma>
+	<koma name="v1">
+	  <class>vert</class><init>4, 1</init>
+	  <goal>4, 1</goal>
+	</koma>
+	<koma name="v2">
+	  <class>vert</class><init>4, 4</init>
+	  <goal>4, 4</goal>
+	</koma>
+  </komaset>
+</puzzle>

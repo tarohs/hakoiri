@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<puzzle name="shougi">
+  <board>
+	<size>7, 6</size>
+  </board>
+  <clssiz>
+	<class name="big">2, 2</class>
+	<class name="vert">2, 1</class>
+	<class name="horiz">1, 2</class>
+	<class name="small">1, 1</class>
+  </clssiz>
+  <komaset>
+	<koma name="oh">
+	  <class>big</class><init>1, 2</init>
+	  <goal>4, 2</goal>
+	</koma>
+	<koma name="hisha">
+	  <class>vert</class><init>1, 1</init>
+	</koma>
+	<koma name="kaku">
+	  <class>vert</class><init>1, 4</init>
+	</koma>
+	<koma name="kou1"><short>k1</short>
+	  <class>small</class><init>3, 1</init>
+	</koma>
+	<koma name="keima1"><short>m1</short>
+	  <class>small</class><init>3, 2</init>
+	</koma>
+	<koma name="keima2"><short>m2</short>
+	  <class>small</class><init>3, 3</init>
+	</koma>
+	<koma name="kou2"><short>k2</short>
+	  <class>small</class><init>3, 4</init>
+	</koma>
+	<koma name="kin">
+	  <class>horiz</class><init>4, 1</init>
+	</koma>
+	<koma name="gin">
+	  <class>horiz</class><init>4, 3</init>
+	</koma>
+	<koma name="fu1"><short>f1</short>
+	  <class>small</class><init>5, 1</init>
+	</koma>
+	<koma name="fu2"><short>f2</short>
+	  <class>small</class><init>5, 4</init>
+	</koma>
+  </komaset>
+</puzzle>

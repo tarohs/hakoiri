@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<puzzle name="Sliding Digits">
+<!--https://www.cs.brandeis.edu/~storer/JimPuzzles/SLIDE/FourSuits2/BaxterPageGrabarchuk.pdf-->
+  <board>
+	<size>11, 11</size>
+	<mirrorident>False</mirrorident>
+	<goaltype>byclass</goaltype>
+  </board>
+  <clssiz>
+	<class name="1"><size>3, 3</size>
+	<bitmap>110
+	        010
+	        111</bitmap>
+	</class>
+	<class name="2"><size>3, 3</size>
+	</class>
+	<class name="3"><size>3, 3</size>
+	<bitmap>111
+	        011
+	        111</bitmap>
+	</class>
+	<class name="4"><size>3, 3</size>
+	<bitmap>101
+	        111
+	        001</bitmap>
+	</class>
+	<class name="5"><size>3, 3</size>
+	</class>
+	<class name="6"><size>3, 3</size>
+	</class>
+	<class name="7"><size>3, 3</size>
+	<bitmap>111
+	        011
+	        011</bitmap>
+	</class>
+	<class name="8"><size>3, 3</size>
+	</class>
+  </clssiz>
+  <komaset>
+	<koma name="1">
+	  <class>1</class><init>1, 1</init>
+	  <goal>1, 1</goal>
+	</koma>
+	<koma name="2">
+	  <class>2</class><init>1, 4</init>
+	  <goal>1, 4</goal>
+	</koma>
+	<koma name="3">
+	  <class>3</class><init>1, 7</init>
+	  <goal>1, 7</goal>
+	</koma>
+	<koma name="4">
+	  <class>4</class><init>4, 1</init>
+	  <goal>4, 1</goal>
+	</koma>
+	<koma name="5">
+	  <class>5</class><init>4, 4</init>
+	  <goal>4, 4</goal>
+	</koma>
+	<koma name="6">
+	  <class>6</class><init>4, 7</init>
+	  <goal>4, 7</goal>
+	</koma>
+	<koma name="7">
+	  <class>7</class><init>7, 4</init>
+	  <goal>7, 1</goal>
+	</koma>
+	<koma name="8">
+	  <class>8</class><init>7, 1</init>
+	  <goal>7, 4</goal>
+	</koma>
+  </komaset>
+</puzzle>

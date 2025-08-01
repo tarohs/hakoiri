@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<puzzle name="Gauntlet #2 by Bob Henderson">
+<!--https://nbickford.wordpress.com/2013/11/13/sliding-block-puzzles-part-4-of-3/-->
+  <board>
+	<size>7, 6</size>
+  </board>
+  <clssiz>
+	<class name="yellow"><size>1, 1</size></class>
+        <class name="turquoise"><size>1, 3</size></class>
+	<class name="pink"><size>3, 1</size></class>
+	<class name="green"><size>1, 2</size></class>
+	<class name="blue"><size>2, 1</size></class>
+	<class name="red"><size>1, 1</size></class>
+  </clssiz>
+  <komaset>
+	<koma name="y1">
+	  <class>yellow</class><init>1, 1</init>
+	</koma>
+	<koma name="y2">
+	  <class>yellow</class><init>2, 2</init>
+	</koma>
+	<koma name="y3">
+	  <class>yellow</class><init>3, 2</init>
+	</koma>
+	<koma name="y4">
+	  <class>yellow</class><init>5, 1</init>
+	</koma>
+	<koma name="turquoise">
+	  <class>turquoise</class><init>1, 2</init>
+	</koma>
+	<koma name="pink">
+	  <class>pink</class><init>2, 1</init>
+	</koma>
+	<koma name="g1">
+	  <class>green</class><init>2, 3</init>
+	</koma>
+	<koma name="g2">
+	  <class>green</class><init>4, 2</init>
+	</koma>
+	<koma name="g3">
+	  <class>green</class><init>5, 2</init>
+	</koma>
+	<koma name="blue">
+	  <class>blue</class><init>3, 4</init>
+	</koma>
+	<koma name="red">
+	  <class>red</class><init>5, 4</init>
+	  <goal>1, 1</goal>
+	</koma>
+  </komaset>
+</puzzle>
