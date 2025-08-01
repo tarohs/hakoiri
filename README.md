@@ -3,7 +3,7 @@ hakoiri.py - sliding block puzzle solver
 
 [Hakoiri Musume (Wikipedia, Japanese)](https://ja.wikipedia.org/wiki/%E7%AE%B1%E5%85%A5%E3%82%8A%E5%A8%98_(%E3%83%91%E3%82%BA%E3%83%AB)) or [Klotski (Wikipedia, English)](https://en.wikipedia.org/wiki/Klotski) is a name of "sliding block" puzzle.
 
-I wrote a Japanese Blog about long journy of this solver;
+I wrote a Japanese Blog about long journey of this solver;
 
 * Part I: https://zenn.dev/taroh/articles/2703c914dd6597
 * Part II: https://zenn.dev/taroh/articles/80874e761c18d7
@@ -16,7 +16,7 @@ This solver can solve a puzzle & find optimal # of "move history" for the Klotsk
 * The game board is (basically) rectangular shaped, with the "wall" around.
 * The pieces (Koma) are rectangular (or n-mino like) shaped.
   * Some pieces have the same shape; here I name that "Komaclass" of the pieces.
-* Size of the board & all pieces are the multiply of basic unit.  The pieces can move (slide) inside the board by the unit(s) if there is space (gap) to move.
+* Size of the board & all pieces are the multiple of basic unit.  The pieces can move (slide) inside the board by the unit(s) if there is space (gap) to move.
   * Pieces cannot jump over the other pieces, nor go out of the wall.
 
 ### Initial state & goal of the game
@@ -47,7 +47,7 @@ wa .  .  sh
 .  mu mu .  
 ```
 
-(In the original Klotski, each pieces does not have names (you may name as "s1, s2, ..." in the XML definition), while pieces for Hakoiri-musume have identical name of a family - "musume" (daughter), "chichi" (father), "haha" (mother), etc.)
+(In the original Klotski, each piece does not have names (you may name as "s1, s2, ..." in the XML definition), while pieces for Hakoiri-musume have identical name of a family - "musume" (daughter), "chichi" (father), "haha" (mother), etc.)
 
 * On the above example, 4x5 (horizontal x vertical) board is given.
 * Pieces belongs to 4 Komaclasses:
@@ -75,7 +75,7 @@ usage: hakoiri.py [-h] [-p] [-n] [-r] [-t] [-s N] [-x N] [-d N] [-c] [-v]
 * positional arguments: `PUZZLENAME`: specify XML file
 * options:
   * `-p, --paralell`: paralell search (default), `-n, --nonparalell`: non paralell search
-    * `-x, --maxnprocs N`: maximum # child processes (deault 10, see below)
+    * `-x, --maxnprocs N`: maximum # child processes (default 10, see below)
 	* `-d, --minnsearchdiv` N: minimum # candidates in a division for a child (default 200, see below)
   * `-t, --optsteps`: optimize for steps (default), `-r, --optrlc`: optimize for RLC (rectlinear count) (see below)
   * `-s, --stopsteps N`: stop at N steps/RLC
@@ -90,7 +90,7 @@ This solver finds the optimal "steps" or "rectlinear counts."
 * a step: a piece move on one basic "unit" then it's one step,
 * a rectlinear counts (RLC): one piece can move contiguously (any steps) then it's one RLC.
 
-On the example above, "wa" can move east, then can move east one step more.  Tha's 2 steps, but 1 RLC.
+On the example above, "wa" can move east, then can move east one step more.  That's 2 steps, but 1 RLC.
 
 This definition is a big problem when defining the puzzle.  See the chapter "Metrics - a.k.a. redefining the problem" on the document [Sliding Block Puzzles, Part 3 (by NBICKFORD)](https://nbickford.wordpress.com/2012/01/22/sliding-block-puzzles-part-3/).
 
@@ -130,7 +130,7 @@ we we .  .  .  .
 we we .  .  .  .  
 ```
 
-On this puzzle, the goal is when either of "ea" (east) or "we" (west) reaches to the south-west corner of the board.  On the figure above, "we" represent for the komaclass "big" (2x2), but also "ea" belongs to the "big" class, then reaching "ea" at the south-west corner also achieves goal.
+On this puzzle, the goal is when either of "ea" (east) or "we" (west) reaches to the south-west corner of the board.  On the figure above, "we" represent for the Komaclass "big" (2x2), but also "ea" belongs to the "big" class, then reaching "ea" at the south-west corner also achieves goal.
 
 The most useful case of defining Komaclass goal is the famous [Conway's "Century and a half" puzzle](https://www.cs.brandeis.edu/~storer/JimPuzzles/ZPAGES/zzzCenturyPuzzles.html) (puzzles/century+.xml).
 
@@ -187,8 +187,8 @@ Note: all the coords here is as (y, x) (vertical-horizontal), starts with (1, 1)
 By checking the definitions of puzzle and command line options, the solver modify some of the definitions/configurations.  The command line option `-c` will help to check the modified definitions/configurations.
 
 * (see above) If any of a piece is asymmetrical, `mirrorident` (search option but belongs to the puzzle definition) turns off (`False`).
-* Goaltype and Komaclasses: If you specify goal judgement type by ID of pieces (`byid` option, displayes as `BYID`) or by Komaclass (`byclass` option, displayed as `BYCLS`/`BYCLSHASH`), may be changed.
-  * `BYCLS` may be changed to `BYCLSHASH` if all the pieces are specified as the target of goal (as "puzzles/century+50.xml") for the sake of the efficiancy of judgement of the goal.
+* Goaltype and Komaclasses: If you specify goal judgement type by ID of pieces (`byid` option, displayed as `BYID`) or by Komaclass (`byclass` option, displayed as `BYCLS`/`BYCLSHASH`), may be changed.
+  * `BYCLS` may be changed to `BYCLSHASH` if all the pieces are specified as the target of goal (as "puzzles/century+50.xml") for the sake of the efficiency of judgement of the goal.
   * If `BYID` is specified and multiple pieces are in the same Komaclass of a goal target piece, the piece size/shape is copied to a new class and the goal target piece is moved to the new class (otherwise the solution won't be the optimal).
 
 
