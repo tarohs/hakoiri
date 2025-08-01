@@ -104,7 +104,7 @@ The command line options
   * `-x, --maxnprocs N` specifies max number of children, that should be defined by number of the CPU core.
   * `-d, --minnsearchdiv N`: specifies minimum # of search candidates for one child process.  This should be decided by the fork overhead; when the {time to fork overhead + hand data from parent to child & child to parent (and a bit more - parent must merge the results from children)} exceeds the {time to search `N` candidates}, not to fork child(ren) is faster.
 
-Actual # of fork processes at each step/RLC are decided by the `-x/-d` values dinamically, and displayed on the running monitor as `(p8)` (8 children are forked).
+Actual # of fork processes at each step/RLC are decided by the `-x/-d` values dynamically, and displayed on the running monitor as `(p8)` (8 children are forked).
 
 ## Puzzle definitions
 
@@ -165,12 +165,12 @@ Note: all the coords here is as (y, x) (vertical-horizontal), starts with (1, 1)
 
 * `<puzzle name="NAME">`: main definitions
   * `<board>` section: definition of game board & general config.
-    * `<size>`: coords of board size.  The size includes the "wall" block, +2 for the movable spaces for pieces.
-	* `<extwall>` (optional): if the game board is not square, use this to set the coords of an extra wall unit.  Can be used repeatedly to set the multiple extra wall units.  See "puzzles/d209.xml" (one extra wall unit at a corner) or "puzzles/simplifcity2.xml" (one "hole" on a wall - put 3 extra wall unit out of a board edge of 4 units).
-	* `<goaltype>: (see the above section "The classes")
-	  * `byid`: specify coords of the goal target piece(s).
-	  * `byclass`: specify coords of the goal target Komaclass(es).
-	* `<mirrorident>` (optional): `True` (default) or `False`.  For the efficiancy of the search, "mirrored" state of the board is recorded in the "memoization."  But it should be disabled in some cases (ex. asymmetrical piece exists - automatically be `False`).
+    * `<size>`: coords of board size.  The size includes the "wall" block, add (+2, +2) to the movable spaces for pieces.
+	* `<extwall>` (optional): if the game board is not square, use this to set the coords of an extra wall unit (1x1).  Can be used repeatedly to set the multiple extra wall units.  See "puzzles/d209.xml" (one extra wall unit at a corner) or "puzzles/simplifcity2.xml" (one "hole" on a wall - put 3 extra wall unit out of a board edge of 4 units).
+	* `<goaltype>`: (see the above section "The classes")
+	  * `byid`: specify coords of the goal target piece(s).  Inside the program, it's called (and displayed as) `BYID`.
+	  * `byclass`: specify coords of the goal target Komaclass(es).  `BYCLS` (`BYCLSHASH`) in the program.
+	* `<mirrorident>` (optional): `True` (default) or `False`.  For the efficiancy of the search, "mirrored" state of the board is recorded in the "memoization."  This option will be disabled automatically in some cases (ex. asymmetrical piece exists).
   * `<clssiz>` section: definition of size & shape of pieces by Komaclasses.
     * `<class name="CLASSNAME">`:
 	  * `<size>`: define the size of the Komaclass (rectangular, or outer bound for non-rectangular pieces)
