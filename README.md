@@ -176,7 +176,7 @@ Note: all the coords here is as (y, x) (vertical-horizontal), starts with (1, 1)
 	  * `<size>`: define the size of the Komaclass (rectangular, or outer bound for non-rectangular pieces)
 	  * `<bitmap>` (optional): define shape of the non-rectangular Komaclass by bitmap.  If not exists, the Komaclass pieces is assumed to be rectangular.  `1` stands for existing part of the piece, `0` for a gap.  The `0`/`1` are aligned in order of screen (west to east, north to south), and the number of `0`/`1` must exact be (width x height) defined in the `<size>`.  Only `1` or `0` characters between `<bitmap>...</bitmap>` are valid, so you can write "L" shaped block as any of `1011`, `10/11` or `10<cr>__11`, as you like.
   * `<komaset>` section: definition of each identical piece (Koma)
-    * `<koma name="KOMANAME">:
+    * `<koma name="KOMANAME">`:
 	  * `<class>`: Komaclass of the piece.
 	  * `<init>`: initial coords of the piece.  The coords of the north-west (upper-left) corner of the piece (rectangular, or outer bound) represents for the coords for the piece.
 	  * `<goal>` (optional): if the piece is (one of) goal-target (or goal-target Komaclass), specify coords (north-west).  If goal-target Komaclass, writing `<goal>` at any of the piece belongs to the Komaclass is equivalent (but write only one `<goal>` on one `<koma>`).
