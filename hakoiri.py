@@ -52,7 +52,9 @@
 #                       ismirrorident auto switch off if non-symmetric
 #                       koma exists
 # 2025. 8. 1: ver. 4.5: options to be struct
-version = '4.5'
+# 2025. 8. 4: ver. 4.6: pre-collision-judgement (projection to x-/y-axis) 
+#                       introduced (on opt-RLC search only)
+version = '4.6'
 #
 # articles:
 #   (Part I):  https://zenn.dev/taroh/articles/2703c914dd6597
@@ -73,7 +75,7 @@ import argparse
 import hakocom as hi
 from hakocom import Coords, \
     Komaid, Komacls, Colist, Codict, Schash, Sclist, Dirid, \
-    Move, Movehist, Rlc, Bmatrix, \
+    Move, Movehist, Rlc, Bmatrix, Projection, \
     Goaltype, Mcr, \
     Puzzle, Options
 from hakocom import cox, coy, co2yx, yx2co
@@ -346,13 +348,20 @@ def hakochild_optsteps(puzzle: Puzzle,
         movehist = mcr.movehist
         colist = mcr.colist
         rlc = mcr.rlc
-        bmx = hi.makebmatrix(puzzle, colist, Komaid(1))
+        bmx = hi.makebmatrix(puzzle, colist)
+# pre-collision-judgement: in opt-steps search, it makes slower
+#   because of making of gapproj/komaproj
+#        gapproj = mkgapproj(puzzle.bsize, bmx)
         for k in range(1, puzzle.nkoma + 1):
             kid = Komaid(k)
-            if kid != 1:
-                hi.drawerasebmx(puzzle, puzzle.komacls[kid], colist[kid],
-                                bmx, mode = 0) # erase rect
+            hi.drawerasebmx(puzzle, puzzle.komacls[kid], colist[kid],
+                            bmx, mode = 0) # erase rect
+# pre-collision-judgement
+#            komaproj = mkkomaproj(mcr.colist[kid],
+#                                     puzzle.clssiz[puzzle.komacls[kid]])
             for dn in range(4):
+# pre-collision-judgemnt: only used here in 1st step (not in cancontigmove())
+#                isprecollide, gapproj = precollidep(dn, gapproj, komaproj)
                 dirid = Dirid(dn)
                 if movehist[-1][0] == kid and \
                    (movehist[-1][1] - dirid + 4) % 4 == 2:
@@ -360,7 +369,8 @@ def hakochild_optsteps(puzzle: Puzzle,
                    continue
 #                monitor(f'{kid} moves to {dirid}: ')
                 co = Coords(colist[kid] +  hi.dirvec[dirid])
-                if hi.collidep(puzzle, puzzle.komacls[kid], co, bmx):
+                if hi.collidep(co, puzzle.clssiz[puzzle.komacls[kid]],
+                               puzzle.clsshape[puzzle.komacls[kid]], bmx):
 #                    monitor('... cannot move')
                     continue
 #Colist == list version
@@ -421,9 +431,93 @@ def cancontigmove(puzzle: Puzzle, bmx: Bmatrix,
         if (lastmdir - dirid + 4) % 4 == 2:  # opposit direction
             continue
         co = Coords(lastco + hi.dirvec[dirid])
-        if not hi.collidep(puzzle, puzzle.komacls[lastmkoma], co, bmx):
+        if not hi.collidep(co, puzzle.clssiz[puzzle.komacls[lastmkoma]],
+                           puzzle.clsshape[puzzle.komacls[lastmkoma]], bmx):
             return True
     return False
+
+# gap & koma projection (example: proj to x-axis; y-axis also):
+#   0/1 sequence for projection of gap on the board (gap == 1, but 0 on board),
+#                    projection of koma (shifted on koma x).
+#   ex.     board     koma
+#           1111
+#           1011      .01.
+#           0111      .11.
+#   xproj:  --------------
+#           1100      0110
+#   neighbor east     0001
+#   neighbor west     1000
+# * note 1: koma can move only if
+#             - gapproj & komaproj == 1..1{komawidth} (vertical move)
+#             - gapproj & (west/east neighbor) == 1 (horizontal move)
+# * note 2: koma proj always 1..1{komawidth} even if n-mino like koma
+
+def mkgapproj(bsize: Coords, bmx: Bmatrix) -> Projection:
+    gpj = (1 << cox(bsize)) - 1
+    gpm = gpj
+    gpy = 0
+    for y in range(coy(bsize) - 2, 0, -1):
+        gpj &= bmx[y]
+        gpy = (gpy << 1) | (bmx[y] != gpm)
+#    for y in range(len(bmx)):
+#        print(bin(bmx[y])[-1:1:-1])
+#    print(bin(gpy << 1), bin(~gpj & gpm))
+    return Projection((gpy << 1, ~gpj & gpm))
+
+def mkkomaproj(co: Coords, sz: Coords) -> Projection:
+    ky, kx = co2yx(co)
+    zy, zx = co2yx(sz)
+#    print('k',
+#          bin((1 << (ky + zy)) - (1 << ky)),
+#          bin((1 << (kx + zx)) - (1 << kx)))
+    return Projection(((1 << (ky + zy)) - (1 << ky),
+                       (1 << (kx + zx)) - (1 << kx)))
+
+# koma proj :01110  01110
+#  <</>> 1  :11100  00111
+# xor       :10010  01001 (west/east neighbor and east/west edge == 1)
+# ~koma     :10001  10001 (outside koma is 1)
+def neighbores(kpj: int):  # east & south neighbor (x & y increase)
+    return (kpj ^ (kpj << 1)) & ~kpj
+
+def neighborwn(kpj: int):  # west & north neighbor (x & y decrease)
+    return (kpj ^ (kpj >> 1)) & ~kpj
+
+def precollidep(dn: int, gapproj: Projection, komaproj: Projection) \
+    -> tuple[bool, Projection]:
+    '''
+    pre-collision check below only on 1st depth of recurse, or
+    on contigurous move to the vertical (gapprojx)/horizontal (gapprojy).
+    otherwise gapproj may change
+    '''
+#                hi.printnamematrix(puzzle, mcr.colist)
+#                print(puzzle.komanamshort[kid], dn)
+#                print(bin(gapproj), bin(komaproj),
+#                      bin(neighboreast(komaproj)),
+#                      bin(neighborwest(komaproj)))
+    match dn:
+        case 0:  # north
+            if gapproj[1] & komaproj[1] != komaproj[1] or \
+               gapproj[0] & neighborwn(komaproj[0]) == 0:
+                return (True, gapproj)
+            gapproj = Projection((0xffff, gapproj[1]))
+        case 1:  # east
+            if gapproj[1] & neighbores(komaproj[1]) == 0 or \
+               gapproj[0] & komaproj[0] != komaproj[0]:
+                return (True, gapproj)
+            gapproj = Projection((gapproj[0], 0xffff))
+        case 2:  # south
+            if gapproj[1] & komaproj[1] != komaproj[1] or \
+               gapproj[0] & neighbores(komaproj[0]) == 0:
+                return (True, gapproj)
+            gapproj = Projection((0xffff, gapproj[1]))
+        case _:  # west
+            if gapproj[1] & neighborwn(komaproj[1]) == 0 or \
+               gapproj[0] & komaproj[0] != komaproj[0]:
+                return (True, gapproj)
+            gapproj = Projection((gapproj[0], 0xffff))
+    return (False, gapproj)
+
 
 
 def hakochild_optrlc(puzzle: Puzzle,
@@ -437,7 +531,9 @@ def hakochild_optrlc(puzzle: Puzzle,
     def contigmove(kid: Komaid, mcr: Mcr, perpet: list[Coords],
                    bmx: Bmatrix,
                    memoschash: set[Schash], nextsearch: dict[Schash, Mcr],
-                   foundans: list[Mcr]
+                   foundans: list[Mcr],
+                   gapproj: Projection = Projection((0, 0)),
+                   komaproj: Projection = Projection((0, 0))
                    ) -> None:
         '''
         recursive DFS:
@@ -456,16 +552,15 @@ def hakochild_optrlc(puzzle: Puzzle,
         rlc = mcr.rlc # is already increased if called by hakochild
                       # (not increased when called by itself)
         for dn in range(4):
+            isprecollide, gapproj = precollidep(dn, gapproj, komaproj)
+            if isprecollide:
+                continue
             dirid = Dirid(dn)
-#            if movehist[-1][0] == kid and \
-#               (movehist[-1][1] - dirid + 4) % 4 == 2:
-#                # same as last moved koma and opposite dir
-#                continue
-#            monitor(f'{kid} moves to {dirid}')
             newco = Coords(colist[kid] +  hi.dirvec[dirid])
             if newco in perpet or \
-               hi.collidep(puzzle, puzzle.komacls[kid], newco, bmx):
-                monitor('... cannot move or perpetual')
+               hi.collidep(newco, puzzle.clssiz[puzzle.komacls[kid]],
+                           puzzle.clsshape[puzzle.komacls[kid]], bmx):
+#                monitor('... cannot move or perpetual')
                 continue
             newmovehist = Movehist(movehist + (Move((kid, dirid)), ))
             newcolist = Colist(colist[:kid] + (newco, ) + colist[kid + 1:])
@@ -491,7 +586,8 @@ def hakochild_optrlc(puzzle: Puzzle,
 #                monitor(f'{newschash} in memo or (in cand and not shorter) ' +
 #                        '(cont move)')
             contigmove(kid, Mcr(newmovehist, newcolist, rlc), perpet + [newco],
-                       bmx, memoschash, nextsearch, foundans)
+                       bmx, memoschash, nextsearch, foundans,
+                       gapproj = gapproj, komaproj = komaproj)
         return
 
 #    monitor(f'(c)@{len(tosearch)}')
@@ -501,6 +597,7 @@ def hakochild_optrlc(puzzle: Puzzle,
     foundans: list[Mcr] = []
     for mcr in tosearch:
         bmx = hi.makebmatrix(puzzle, mcr.colist)
+        gapproj = mkgapproj(puzzle.bsize, bmx)
         mcr.rlc = Rlc(mcr.rlc + 1)
         for k in range(1, puzzle.nkoma + 1):
             kid = Komaid(k)
@@ -508,10 +605,13 @@ def hakochild_optrlc(puzzle: Puzzle,
                 # the same koma as the last doesnot move (it's optrlc)
                 continue
             hi.drawerasebmx(puzzle, puzzle.komacls[kid], mcr.colist[kid],
-                            bmx, mode = 0) # erase rect
-            contigmove(kid, mcr, [], bmx, memoschash, nextsearch, foundans)
+                            bmx, mode = 0) # erase koma
+            komaproj = mkkomaproj(mcr.colist[kid],
+                                     puzzle.clssiz[puzzle.komacls[kid]])
+            contigmove(kid, mcr, [], bmx, memoschash, nextsearch, foundans,
+                       gapproj = gapproj, komaproj = komaproj)
             hi.drawerasebmx(puzzle, puzzle.komacls[kid], mcr.colist[kid],
-                            bmx, mode = 1) # draw rect, recover koma
+                            bmx, mode = 1) # draw (recover) koma
 #    monitor(f'>(c)checked {len(tosearch)}, ret {len(nextsearch)}')
 #    for h, mcr in nextsearch.items():
 #        print(f'{len(mcr.movehist) - 1} ({hex(h)})')

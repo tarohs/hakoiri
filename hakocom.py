@@ -50,9 +50,9 @@ Move = NewType('Move', tuple[Komaid, Dirid])
 #Movehist = NewType('Movehist', list[Move])
 # Movehist == tupple version # note: this reducts deepcopy(), super big effect
 Movehist = NewType('Movehist', tuple[Move, ...])
-
 Rlc = NewType('Rlc', int)
 Bmatrix = NewType('Bmatrix', list[int])
+Projection = NewType('Projection', tuple[int, int])
 
 @dataclass
 class Mcr:
@@ -111,22 +111,22 @@ CLS_WALL = Komacls(99)
 # short funcs
 #
 def coy(co: Coords) -> int:
-    return co >> 4 & 0x0f
+    return (co >> 4) & 0xf
 def cox(co: Coords) -> int:
-    return co & 0x0f
+    return co & 0xf
 def co2yx(co: Coords) -> tuple[int, int]:
-    return ((coy(co), cox(co)))
+    return ((co >> 4) & 0xf, co & 0xf)
 def yx2co(yx: tuple[int, int]) -> Coords:
     y, x = yx
-    return Coords(y << 4 | x)
+    return Coords((y << 4) | x)
 
 #
 # cooreds & hash functions
 #
-def comirror(co: Coords, komawidth: int, boardwidth: int) -> Coords:
-    ys, x = co & 0xf0, co & 0x0f
-    mx = (boardwidth - 1 - x) - (komawidth - 1)
-    return Coords(ys | mx)
+#def comirror(co: Coords, komawidth: int, boardwidth: int) -> Coords:
+#    ys, x = co & 0xf0, co & 0xf
+#    mx = (boardwidth - 1 - x) - (komawidth - 1)
+#    return Coords(ys | mx)
 
 def hashcolist(puzzle: Puzzle, colist: Colist) -> Schash:
     def clssort(colist: Colist, ismirror: bool) \
@@ -145,7 +145,7 @@ def hashcolist(puzzle: Puzzle, colist: Colist) -> Schash:
         return Sclist(tuple(v for k, v in cosorted))
 
     def comirror(co: Coords, komawidth: int, boardwidth: int) -> Coords:
-        ys, x = co & 0xf0, co & 0x0f
+        ys, x = co & 0xf0, co & 0xf
         mx = boardwidth - x - komawidth
         return Coords(ys | mx)
 
@@ -165,20 +165,21 @@ def hashcolist(puzzle: Puzzle, colist: Colist) -> Schash:
 #------------------------------------------------------------------------
 # board matrix functions
 #
-def makemask(puzzle: Puzzle, kcls: Komacls, co: Coords):
+def makemask(shape: list[int], komax: int):
     mask = []
-    for mrow in puzzle.clsshape[kcls]:
-        mask.append(mrow << cox(co))
+    for mrow in shape:
+        mask.append(mrow << komax)
     return mask
 
 
-def collidep(puzzle: Puzzle, kcls: Komacls, co: Coords, bmx: Bmatrix) -> bool:
+def collidep(co: Coords, ksize: Coords, shape: list[int], bmx: Bmatrix) \
+    -> bool:
     if co == Coords(0):
         return False
-    ce = co + puzzle.clssiz[kcls]
-    mask = makemask(puzzle, kcls, co)
+    ce = co + ksize
+    mask = makemask(shape, cox(co))
     sum = 0
-    for yo in range(coy(puzzle.clssiz[kcls])):
+    for yo in range(coy(ksize)):
         sum += bmx[coy(co) + yo] & mask[yo]
     if sum != 0:
         return True
@@ -207,7 +208,7 @@ def drawerasebmx(puzzle: Puzzle, kcls: Komacls, co: Coords,
 #    print(f'(draw){kcls = }, co = {hex(co)}')
 #    for r in bmx:
 #        print(bin(r)[-1:1:-1])
-    mask = makemask(puzzle, kcls, co)
+    mask = makemask(puzzle.clsshape[kcls], cox(co))
     for yo in range(coy(puzzle.clssiz[kcls])):
         match mode:
             case 0:
@@ -428,26 +429,26 @@ def printoptions(opts: Options):
           
 
 #........................................................................
-if __name__ == '__main__':
-    puzzle = Puzzle()
-    puzzle.bsize = yx2co((7, 6))
-    print(puzzle)
-# debug co2yx(), yx2co()
-## debug co2cov(), cov2co()
-    for komawidth in [1, 2]:
-        print(f'non-mirror, mirror: (komawidth {komawidth})')
-        for y in range(1, coy(puzzle.bsize) - 2 + 1):
-            for x in range(1, cox(puzzle.bsize) - 2 - (komawidth - 1) + 1):
-#                co = Coords((y, x))
-#                cov = co2cov(puzzle, co)
-#                cco = cov2co(puzzle, cov)
-                yx = (y, x)
-                co = yx2co(yx)
-                cyx = co2yx(co)
-                mco = comirror(co, komawidth, cox(puzzle.bsize))
-                mcyx = co2yx(mco)
-                print(f'{yx} -> {hex(co)},{hex(mco)} -> {cyx},{mcyx}')
-
+#if __name__ == '__main__':
+#    puzzle = Puzzle()
+#    puzzle.bsize = yx2co((7, 6))
+#    print(puzzle)
+## debug co2yx(), yx2co()
+### debug co2cov(), cov2co()
+#    for komawidth in [1, 2]:
+#        print(f'non-mirror, mirror: (komawidth {komawidth})')
+#        for y in range(1, coy(puzzle.bsize) - 2 + 1):
+#            for x in range(1, cox(puzzle.bsize) - 2 - (komawidth - 1) + 1):
+##                co = Coords((y, x))
+##                cov = co2cov(puzzle, co)
+##                cco = cov2co(puzzle, cov)
+#                yx = (y, x)
+#                co = yx2co(yx)
+#                cyx = co2yx(co)
+#                mco = comirror(co, komawidth, cox(puzzle.bsize))
+#                mcyx = co2yx(mco)
+#                print(f'{yx} -> {hex(co)},{hex(mco)} -> {cyx},{mcyx}')
+#
 #------------------------------------------------------------------------
 # system
 def errorstop(message: str) -> NoReturn:

@@ -265,7 +265,8 @@ def checkcolist(puzzle, colist: Colist) -> None:
                   f'{co2yx(kcoords)} exceeds board size ' +\
                   f'{co2yx(puzzle.bsize)}')
         if 1 < kid and \
-           hi.collidep(puzzle, puzzle.komacls[kid], colist[kid], bmx):
+           hi.collidep(colist[kid], puzzle.clssiz[puzzle.komacls[kid]],
+                       puzzle.clsshape[puzzle.komacls[kid]], bmx):
             hi.printnamematrix(puzzle, Colist(tuple(lastcol)),
                                file = sys.stderr)
             hi.errorstop(
