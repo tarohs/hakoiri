@@ -40,7 +40,7 @@
 	<koma name="p9">
 	  <class>small</class><init>5, 1</init>
 	</koma>
-	<koma name="p10">
+	<koma name="p10"><short>p0</short>
 	  <class>horiz</class><init>5, 2</init>
 	</koma>
   </komaset>
