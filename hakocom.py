@@ -81,10 +81,10 @@ class Puzzle:
     komanamshort: list[str] = field(default_factory = list)
     initcolist: tuple[Coords, ...] = field(default_factory = tuple)
     # one of the below 3 is valid:
-    goal_koma: list[tuple[Komaid, Coords]] \
+    goalkoma: list[tuple[Komaid, Coords]] \
         = field(default_factory = list[tuple[Komaid, Coords]])
     # all komas (class compatible) reaches their goals
-    goal_schash: Schash = Schash(0)
+    goalhash: Schash = Schash(0)
 
 @dataclass
 class Options:
@@ -241,29 +241,29 @@ def makebmatrix(puzzle: Puzzle, col: Colist | list[Coords],
 #------------------------------------------------------------------------
 # goal functions
 #
-def isgoal(puzzle: Puzzle, colist: Colist, ph: int) -> bool:
+def isgoal(puzzle: Puzzle, colist: Colist, hsh: int) -> bool:
     match puzzle.goaltype:
         case Goaltype.BYCLSHASH:
             # (all komaclass's coords are specified):
-            if puzzle.goal_schash == ph:
+            if puzzle.goalhash == hsh:
                 return True
             else:
                 return False
         case Goaltype.BYID:
             cnt = 0
-            for kid, gcoords in puzzle.goal_koma:
+            for kid, gcoords in puzzle.goalkoma:
 #                print(f'@{kid}-{hex(colist[kid])}:{hex(gcoords)}', end = '|')
                 if colist[kid] == gcoords:
                     cnt += 1
 #            print(cnt)
-            if cnt == len(puzzle.goal_koma):
+            if cnt == len(puzzle.goalkoma):
                 return True
             else:
                 return False
         case Goaltype.BYCLS:
             # (partial komaclass's coords are specified):
             cnt = 0
-            for kid, gcoords in puzzle.goal_koma:
+            for kid, gcoords in puzzle.goalkoma:
                 gcls = puzzle.komacls[kid]
                 # count if any koma in the class is at the coords.
                 for ki in range(1, puzzle.nkoma + 1):
@@ -271,7 +271,7 @@ def isgoal(puzzle: Puzzle, colist: Colist, ph: int) -> bool:
                        colist[ki] == gcoords:
                         cnt += 1
                         break
-            if cnt == len(puzzle.goal_koma):
+            if cnt == len(puzzle.goalkoma):
                 return True
             else:
                 return False
@@ -359,7 +359,7 @@ def printpuzzle(puzzle):
     print(f'        mirrorident = {puzzle.ismirrorident}')
     print(f'        goaltype = {puzzle.goaltype}', end = '')
     if puzzle.goaltype == Goaltype.BYCLSHASH:
-        print(f' (hash = {hex(puzzle.goal_schash)})')
+        print(f' (hash = {hex(puzzle.goalhash)})')
     else:
         print()
 
@@ -397,7 +397,7 @@ def printpuzzle(puzzle):
     else:
         print('\n  goal (komaclass):')
     gkomalist = [0] * (puzzle.nkoma + 1)
-    for id, co in puzzle.goal_koma:
+    for id, co in puzzle.goalkoma:
         gkomalist[id] = co
     printnamematrix(puzzle, Colist(tuple(gkomalist)))
     print()

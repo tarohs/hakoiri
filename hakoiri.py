@@ -54,7 +54,8 @@
 # 2025. 8. 1: ver. 4.5: options to be struct
 # 2025. 8. 4: ver. 4.6: pre-collision-judgement (projection to x-/y-axis) 
 #                       introduced (on opt-RLC search only)
-version = '4.6'
+# 2025. 8.15-20: ver. 4.7: readpuzzle.py rewritten (reverse imported from 5.1)
+version = '4.7'
 #
 # articles:
 #   (Part I):  https://zenn.dev/taroh/articles/2703c914dd6597
@@ -84,7 +85,6 @@ import readpuzzle as rx
 
 #........................................................................
 # global in main module
-timer: float
 
 #------------------------------------------------------------------------
 def monitor(message: object) -> None:
@@ -97,6 +97,7 @@ def main() -> None:
     # set by getoptoins()
     opts = getoptions()
     puzzle = rx.readxml(opts)
+#    print(puzzle)
     hi.printoptions(opts)
     hi.printpuzzle(puzzle)
     monitor(puzzle)
@@ -167,6 +168,7 @@ def hakosearch(puzzle: Puzzle, opts: Options) -> None:
     (paralell) horizontal search
     '''
     timer = time.time()
+    steptimer = timer
     memoschash: set[Schash] = set()
     # put the init pos in memo
     memoschash.add(hi.hashcolist(puzzle, Colist(puzzle.initcolist)))
@@ -192,10 +194,14 @@ def hakosearch(puzzle: Puzzle, opts: Options) -> None:
             nprocs = opts.maxnprocs
             nsearchdiv = nsearch // opts.maxnprocs
         if opts.isparalell and 1 < nprocs:
+            ctimer = time.time()
             print(
-                f'---(p{nprocs}){stepstr}: {step}, cand: {len(tosearch)}, ' +
-                f'time: {time.time() - timer}, memo: {len(memoschash)}'
+                f'---(p{nprocs}){stepstr}: {step}, cand: {len(tosearch)}, ' + \
+                f'time: {ctimer - timer:.3f}, ' + \
+                f'steptime: {ctimer - steptimer:.3f}, ' + \
+                f'memo: {len(memoschash)}'
             )
+            steptimer = ctimer
             nextsearch: dict[Schash, Mcr] = dict()
             st = 0
             futures = []
@@ -294,24 +300,38 @@ def hakosearch(puzzle: Puzzle, opts: Options) -> None:
 #   (always overrides), >= 2 steps after may not be the optimal rlc.
 
         else:
+            ctimer = time.time()
             print(
-                f'---{stepstr}: {step}, cand: {len(tosearch)}, ' +
-                f'time: {time.time() - timer}, memo: {len(memoschash)}'
+                f'---{stepstr}: {step}, cand: {len(tosearch)}, ' + \
+                f'time: {ctimer - timer:.3f}, ' + \
+                f'steptime: {ctimer - steptimer:.3f}, ' + \
+                f'memo: {len(memoschash)}'
             )
+            steptimer = ctimer
             foundans, nextsearch = childfunc(puzzle, tosearch, memoschash)
         memoschash |= set(nextsearch.keys())
         if 0 < len(foundans):
+            ctimer = time.time()
             print(
-                f'---after {stepstr}: {step}, cand: {len(tosearch)}, ' +
-                f'time: {time.time() - timer}, memo: {len(memoschash)}'
+                f'---after {stepstr}: {step}, cand: {len(tosearch)}, ' + \
+                f'time: {ctimer - timer:.3f}, ' + \
+                f'steptime: {ctimer - steptimer:.3f}, ' + \
+                f'memo: {len(memoschash)}'
             )
+            steptimer = ctimer
             print()
             monitor(foundans)
             hi.printbestans(puzzle, foundans, Colist(puzzle.initcolist),
                             opts.isoptrlc)
             # NEVERREACHED
         if step == opts.stopsteps:
-            print(opts.stopsteps, time.time() - timer)
+            ctimer = time.time()
+            print(
+                f'---after {stepstr}: {step}, cand: {len(tosearch)}, ' + \
+                f'time: {ctimer - timer:.3f}, ' + \
+                f'steptime: {ctimer - steptimer:.3f}, ' + \
+                f'memo: {len(memoschash)}'
+            )
             print('@stopped')
 # candidate monitor when stop
         #    for mcr in nextsearch.values():
@@ -517,7 +537,6 @@ def precollidep(dn: int, gapproj: Projection, komaproj: Projection) \
                 return (True, gapproj)
             gapproj = Projection((gapproj[0], 0xffff))
     return (False, gapproj)
-
 
 
 def hakochild_optrlc(puzzle: Puzzle,
