@@ -186,6 +186,9 @@ Note: all the coords here is as (y, x) (vertical-horizontal), starts with (1, 1)
 
 By checking the definitions of puzzle and command line options, the solver modify some of the definitions/configurations.  The command line option `-c` will help to check the modified definitions/configurations.
 
+* (important) Koma class ID is optimized automatically; not the sequence you wrote in the XML.
+  * (after the automatically assigned new class (below, BYID and multiple goal Koma in the class),) Komaclass is assigned as the order of the # of Koma in the class (descending: many -> less), then the area of Koma (ascending: small -> big).
+  * the reason of the order are, remains of "Komaclass list" data structure (used in ver. 5.X), and smaller Koma MAY move actively; the advantages are almost not used in the current algorhythm, however.
 * (see above) If any of a piece is asymmetrical, `mirrorident` (search option but belongs to the puzzle definition) turns off (`False`).
 * Goaltype and Komaclasses: If you specify goal judgement type by ID of pieces (`byid` option, displayed as `BYID`) or by Komaclass (`byclass` option, displayed as `BYCLS`/`BYCLSHASH`), may be changed.
   * `BYCLS` may be changed to `BYCLSHASH` if all the pieces are specified as the target of goal (as "puzzles/century+50.xml") for the sake of the efficiency of judgement of the goal.
