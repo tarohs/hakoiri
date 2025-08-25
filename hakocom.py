@@ -37,7 +37,7 @@ Codict = NewType('Codict', dict[Komaid, Coords])
 # hashed value
 Schash = NewType('Schash', int)
 # hashed (encoded) class+coords ordered Colist
-Sclist = NewType('Sclist', tuple[Coords, ...])
+Sclist = NewType('Sclist', list[Coords])
 # Dirid is int {0, 1, 2, 3}, not enum of vector (tuple)
 #   because: (1) more efficiant than tuple, (2) can know opposite dir easily
 Dirid = NewType('Dirid', int)
@@ -74,6 +74,9 @@ class Puzzle:
     clssiz: list[Coords] = field(default_factory = list)
     clsshape: list[list[int]] = field(default_factory = list)
     clsnam: list[str] = field(default_factory = list)
+    clsimin: list[Komacls] = field(default_factory = list)
+    clsimax: list[Komacls] = field(default_factory = list)
+    clsn: list[int] = field(default_factory = list)
     nkoma: int = 0
     goaltype: Goaltype = Goaltype.BYID
     komacls: list[Komacls] =  field(default_factory = list)
@@ -129,20 +132,72 @@ def yx2co(yx: tuple[int, int]) -> Coords:
 #    return Coords(ys | mx)
 
 def hashcolist(puzzle: Puzzle, colist: Colist) -> Schash:
+# ver. 4.8: class sort only by coords in class local
     def clssort(colist: Colist, ismirror: bool) \
-            -> Sclist:
-        if not ismirror:
-            clscoval = [(puzzle.komacls[kid], colist[kid])
-                        for kid in range(1, puzzle.nkoma + 1)]
-        else:
-            clscoval = [(puzzle.komacls[kid],
-                         comirror (colist[kid],
-                                   cox(puzzle.clssiz[puzzle.komacls[kid]]),
-                                   cox(puzzle.bsize))
-                         ) for kid in range(1, puzzle.nkoma + 1)]
-        cosorted = sorted(sorted(clscoval, key = lambda x: x[1]),
-                          key = lambda x: x[0])
-        return Sclist(tuple(v for k, v in cosorted))
+        -> Sclist:
+        sc = [Coords(0)] * puzzle.nkoma
+        si = 0
+        cn = 1
+        ncls = len(puzzle.clsn) - 1
+        while cn <= ncls:
+            if 2 <= puzzle.clsn[cn]:
+                # real sort inside the class (#member > 2)
+                sie = si + puzzle.clsimax[cn] + 1 - puzzle.clsimin[cn]
+                if ismirror:
+                    sc[si:sie] = sorted(
+                        [comirror(colist[kid],
+                                  cox(puzzle.clssiz[cn]),
+                                  cox(puzzle.bsize))
+                         for kid in range(puzzle.clsimin[cn],
+                                          puzzle.clsimax[cn] + 1)]
+                    )
+                else:
+                    sc[si:sie] = sorted(colist[puzzle.clsimin[cn]:
+                                               puzzle.clsimax[cn] + 1])
+                si = sie
+            elif puzzle.clsn[cn] == 2:
+                # compare & swap inside the class (#member == 2)
+                c1 = colist[puzzle.clsimin[cn]]
+                c2 = colist[puzzle.clsimax[cn]]
+                if ismirror:
+                    c1 = comirror(colist[kid],
+                                  cox(puzzle.clssiz[cn]), cox(puzzle.bsize))
+                    c2 = comirror(colist[kid],
+                                  cox(puzzle.clssiz[cn]), cox(puzzle.bsize))
+                if c1 > c2:
+                    sc[si] = c2
+                    sc[si + 1] = c1
+                else:
+                    sc[si] = c1
+                    sc[si + 1] = c2
+                si += 2
+            else:  # puzzle.clsn[cn] == 1
+                # no need to sort inside the class (#member is 1)
+                if ismirror:
+                    sc[si] = comirror(colist[puzzle.clsimin[cn]],
+                                      cox(puzzle.clssiz[cn]),
+                                      cox(puzzle.bsize))
+                else:
+                    sc[si] = colist[puzzle.clsimin[cn]]
+                si += 1
+            cn += 1
+        return sc
+                              
+# --ver. 4.7: straight sort by class then coords
+    # def clssort(colist: Colist, ismirror: bool) \
+    #         -> Sclist:
+    #     if not ismirror:
+    #         clscoval = [(puzzle.komacls[kid], colist[kid])
+    #                     for kid in range(1, puzzle.nkoma + 1)]
+    #     else:
+    #         clscoval = [(puzzle.komacls[kid],
+    #                      comirror (colist[kid],
+    #                                cox(puzzle.clssiz[puzzle.komacls[kid]]),
+    #                                cox(puzzle.bsize))
+    #                      ) for kid in range(1, puzzle.nkoma + 1)]
+    #     cosorted = sorted(sorted(clscoval, key = lambda x: x[1]),
+    #                       key = lambda x: x[0])
+    #     return Sclist([v for k, v in cosorted])
 
     def comirror(co: Coords, komawidth: int, boardwidth: int) -> Coords:
         ys, x = co & 0xf0, co & 0xf

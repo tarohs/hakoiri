@@ -224,17 +224,20 @@ def readxml(opts: Options) -> Puzzle:
     for c in range(1, ncls + 1):
         cnamcls[puzzle.clsnam[c]] = c
     s = 0
-#    imin: list[Komacls] = [0, ]
-#    imax: list[Komacls] = [0, ]
-#    for c in range(1, ncls + 1):
-#        nc = cnamnk[puzzle.clsnam[c]]
+    imin: list[Komacls] = [0, ]
+    imax: list[Komacls] = [0, ]
+    clsn: list[int] = [0, ]
+    for c in range(1, ncls + 1):
+        nc = cnamnk[puzzle.clsnam[c]]
+        clsn.append(nc)
 #        if nc == 1:
 #            break
-#        imin.append(Komacls(s))
-#        imax.append(Komacls(s + nc - 1))
-#        s += nc
-#    puzzle.clsimin = imin
-#    puzzle.clsimax = imax
+        imin.append(Komacls(s + 1))
+        imax.append(Komacls(s + nc))
+        s += nc
+    puzzle.clsimin = imin
+    puzzle.clsimax = imax
+    puzzle.clsn = clsn
 
 # optimize & assign koma id
     puzzle.nkoma = len(knamset)
@@ -294,8 +297,8 @@ def readxml(opts: Options) -> Puzzle:
         else:
             puzzle.goaltype = Goaltype.BYID
 
-#    print('@@', puzzle)
-#    print(hex(puzzle.inithash))
+    print('@@', puzzle)
+    print(hex(puzzle.inithash))
 
 # check init & goal
     checkcolist(puzzle, Colist(initcolist))

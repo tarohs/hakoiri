@@ -55,7 +55,10 @@
 # 2025. 8. 4: ver. 4.6: pre-collision-judgement (projection to x-/y-axis) 
 #                       introduced (on opt-RLC search only)
 # 2025. 8.15-20: ver. 4.7: readpuzzle.py rewritten (reverse imported from 5.1)
-version = '4.7'
+# 2025. 8. 22: ver. 4.8: local sort inside classes
+# 2025. 8. 23: ver. 4.9: (local sort changed from append() to fixed list,)
+#                        search (add to memo) cutoff after answer found
+version = '4.9'
 #
 # articles:
 #   (Part I):  https://zenn.dev/taroh/articles/2703c914dd6597
@@ -85,6 +88,8 @@ import readpuzzle as rx
 
 #........................................................................
 # global in main module
+
+MAXWORKERS = 24
 
 #------------------------------------------------------------------------
 def monitor(message: object) -> None:
@@ -207,7 +212,7 @@ def hakosearch(puzzle: Puzzle, opts: Options) -> None:
             futures = []
             foundans: list[Mcr] = []
             with concurrent.futures.ProcessPoolExecutor(
-#                    max_workers = MAXWORKERS
+                    max_workers = MAXWORKERS
                  ) as executor:
 #            with concurrent.futures.ProcessPoolExecutor(
 #                    max_workers = nprocs) as executor:
@@ -233,6 +238,8 @@ def hakosearch(puzzle: Puzzle, opts: Options) -> None:
 ## to ignore optimal #steps on optrlc search:
 ##   or optimal #rectlinear-counts on optsteps search (force update)
 #                    nextsearch.update(nschild)
+                    if 0 < len(foundans):
+                        continue
                     if opts.isoptrlc:
 # take account of optimal #steps on optrlc search:
                         for schash, mcr in nschild.items():
@@ -369,8 +376,8 @@ def hakochild_optsteps(puzzle: Puzzle,
         colist = mcr.colist
         rlc = mcr.rlc
         bmx = hi.makebmatrix(puzzle, colist)
-# pre-collision-judgement: in opt-steps search, it makes slower
-#   because of making of gapproj/komaproj
+# pre-collision-judgement (inactivated): in opt-steps search,
+#   it makes slower because of making of gapproj/komaproj
 #        gapproj = mkgapproj(puzzle.bsize, bmx)
         for k in range(1, puzzle.nkoma + 1):
             kid = Komaid(k)
@@ -422,7 +429,8 @@ def hakochild_optsteps(puzzle: Puzzle,
                        newrlc < nextsearch[newschash].rlc or \
                        (newrlc == nextsearch[newschash].rlc and \
                         cancontigmove(puzzle, bmx,
-                                      newcolist, newmovehist[-1])):
+                                      newcolist, newmovehist[-1])) and \
+                        len(foundans) == 0:
                         nextsearch[newschash] = \
                             Mcr(newmovehist, newcolist, newrlc)
                         monitor(
@@ -591,7 +599,8 @@ def hakochild_optrlc(puzzle: Puzzle,
             if not newschash in memoschash and \
                (not newschash in nextsearch or \
                 len(newmovehist) < len(nextsearch[newschash].movehist)
-               ):
+               ) and \
+               len(foundans) == 0:
             #if not newschash in memoschash:
             #  if not newschash in nextsearch:
             #    nextsearch[newschash] = Mcr(newmovehist, newcolist, rlc)
